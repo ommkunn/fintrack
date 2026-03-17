@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
 import { useAuth } from './AuthContext';
 
 // Types
@@ -68,116 +67,74 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }, [state.theme]);
 
-  // Fetch data when user logs in
+  // Fetch data from local storage when user logs in
   useEffect(() => {
     if (!user) {
       setState(prev => ({ ...prev, transactions: [], savingsGoals: {}, isLoading: false }));
       return;
     }
 
-    const fetchData = async () => {
-      setState(prev => ({ ...prev, isLoading: true }));
-      try {
-        const [txResponse, goalsResponse] = await Promise.all([
-          supabase.from('transactions').select('*').order('created_at', { ascending: false }),
-          supabase.from('savings_goals').select('*')
-        ]);
+    try {
+      const storedTx = localStorage.getItem('fintrack_transactions');
+      const storedGoals = localStorage.getItem('fintrack_goals');
+      
+      const parsedTx: Transaction[] = storedTx ? JSON.parse(storedTx) : [];
+      const parsedGoals: Record<string, number> = storedGoals ? JSON.parse(storedGoals) : {};
 
-        if (txResponse.error) throw txResponse.error;
-        if (goalsResponse.error) throw goalsResponse.error;
-
-        const goals: Record<string, number> = {};
-        goalsResponse.data.forEach(g => {
-          goals[g.month] = Number(g.target_amount);
-        });
-
-        setState(prev => ({
-          ...prev,
-          transactions: txResponse.data,
-          savingsGoals: goals,
-          isLoading: false
-        }));
-      } catch (error) {
-        console.error('Error fetching data from Supabase:', error);
-        setState(prev => ({ ...prev, isLoading: false }));
-      }
-    };
-
-    fetchData();
+      setState(prev => ({
+        ...prev,
+        transactions: parsedTx.sort((a,b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()),
+        savingsGoals: parsedGoals,
+        isLoading: false
+      }));
+    } catch (error) {
+      console.error('Error fetching data from local storage:', error);
+      setState(prev => ({ ...prev, isLoading: false }));
+    }
   }, [user]);
+
+  // Sync state changes to local storage
+  useEffect(() => {
+    if (!state.isLoading && user) {
+      localStorage.setItem('fintrack_transactions', JSON.stringify(state.transactions));
+      localStorage.setItem('fintrack_goals', JSON.stringify(state.savingsGoals));
+    }
+  }, [state.transactions, state.savingsGoals, state.isLoading, user]);
 
   const addTransaction = async (tx: Omit<Transaction, 'id' | 'created_at' | 'user_id'>) => {
     if (!user) return;
-    const { data, error } = await supabase
-      .from('transactions')
-      .insert([{ ...tx, user_id: user.id }])
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error adding transaction:', error);
-      return;
-    }
+    
+    const newTx: Transaction = {
+      ...tx,
+      id: crypto.randomUUID(),
+      created_at: new Date().toISOString(),
+      user_id: user.name
+    };
     
     setState(prev => ({
       ...prev,
-      transactions: [data, ...prev.transactions].sort((a,b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      transactions: [newTx, ...prev.transactions].sort((a,b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     }));
   };
 
   const deleteTransaction = async (id: string) => {
     if (!user) return;
-    const { error } = await supabase.from('transactions').delete().eq('id', id);
-    if (error) {
-      console.error('Error deleting transaction:', error);
-      return;
-    }
     setState(prev => ({ ...prev, transactions: prev.transactions.filter(t => t.id !== id) }));
   };
 
   const editTransaction = async (id: string, updates: Partial<Transaction>) => {
     if (!user) return;
-    // Don't want to update user_id or id or created_at
-    const safeUpdates = { ...updates };
-    delete safeUpdates.id;
-    delete safeUpdates.user_id;
-    delete safeUpdates.created_at;
-
-    const { data, error } = await supabase
-      .from('transactions')
-      .update(safeUpdates)
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error editing transaction:', error);
-      return;
-    }
-
+    
     setState(prev => ({
       ...prev,
       transactions: prev.transactions.map(t => 
-        t.id === id ? data : t
+        t.id === id ? { ...t, ...updates } : t
       ).sort((a,b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     }));
   };
 
   const setSavingsGoal = async (month: string, amount: number) => {
     if (!user) return;
-    
-    const { error } = await supabase
-      .from('savings_goals')
-      .upsert(
-        { user_id: user.id, month, target_amount: amount, currency: 'INR' },
-        { onConflict: 'user_id, month' }
-      );
-
-    if (error) {
-      console.error('Error setting savings goal:', error);
-      return;
-    }
-
     setState(prev => ({ ...prev, savingsGoals: { ...prev.savingsGoals, [month]: amount } }));
   };
 

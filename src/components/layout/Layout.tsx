@@ -1,5 +1,5 @@
 import { Outlet, NavLink } from 'react-router-dom';
-import { ChartDonut, Receipt, Wallet, Palette, SignOut } from '@phosphor-icons/react';
+import { ChartDonut, Receipt, Wallet, Palette } from '@phosphor-icons/react';
 import { useFinance } from '../../context/FinanceContext';
 import { useAuth } from '../../context/AuthContext';
 import { useState } from 'react';
@@ -7,7 +7,7 @@ import { ChatbotPanel } from '../features/ai/ChatbotPanel';
 
 export const Layout = () => {
   const { state: { theme }, setTheme } = useFinance();
-  const { user, signOut } = useAuth();
+  const { user, logout } = useAuth();
   const [isThemeOpen, setIsThemeOpen] = useState(false);
 
   const THEMES = [
@@ -25,9 +25,13 @@ export const Layout = () => {
         
         {/* Logo */}
         <div className="flex items-center gap-[var(--space-3)]">
-          <div className="w-[32px] h-[32px] rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] flex items-center justify-center">
-            <span className="text-[var(--color-accent)] font-bold font-mono text-lg leading-none -mt-0.5 ml-0.5">₹</span>
-          </div>
+                <div className="w-8 h-8 rounded-[var(--radius-full)] bg-gradient-to-tr from-[var(--color-accent)] to-[#FFAE00] flex items-center justify-center text-[var(--color-bg)] font-bold text-sm shadow-[0_2px_8px_rgba(var(--color-accent),0.4)]">
+                  {user?.name?.[0]?.toUpperCase() || 'R'}
+                </div>
+                <div className="hidden sm:block">
+                  <p className="text-sm font-bold leading-tight">{user?.name || 'Ren'}</p>
+                  <p className="text-xs text-[var(--color-text-secondary)] opacity-80 leading-tight">Student</p>
+                </div>
           <span className="font-mono font-bold text-[var(--color-text-primary)] text-[var(--text-lg)] tracking-tight">
             fintrack<span className="animate-pulse">_</span>
           </span>
@@ -59,16 +63,6 @@ export const Layout = () => {
              <span className="hidden md:block text-[var(--text-xs)] font-mono capitalize">{theme === 'default' ? 'Obsidian' : theme}</span>
           </button>
           
-          {user && (
-            <button
-              onClick={signOut}
-              title="Sign Out"
-              className="p-2 text-[var(--color-text-secondary)] hover:text-red-500 rounded-[var(--radius-full)] hover:bg-red-500/10 transition-colors flex items-center gap-2"
-            >
-              <SignOut weight="duotone" size={20} />
-            </button>
-          )}
-          
           {isThemeOpen && (
             <div className="absolute top-full right-0 mt-2 w-48 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] shadow-xl overflow-hidden flex flex-col z-50 animate-in fade-in zoom-in-95">
               {THEMES.map((t) => (
@@ -83,6 +77,11 @@ export const Layout = () => {
                   {t.name}
                 </button>
               ))}
+              {user && (
+                <button onClick={() => logout()} className="px-[var(--space-4)] py-[var(--space-3)] text-left font-mono text-[var(--text-sm)] text-[var(--color-danger)] hover:bg-[var(--color-surface-raised)] transition-colors">
+                  Log Out
+                </button>
+              )}
             </div>
           )}
         </div>
