@@ -1,0 +1,162 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: var(--color-bg);
+  --color-surface: var(--color-surface);
+  --color-surface-raised: var(--color-surface-raised);
+  --color-border: var(--color-border);
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-accent: var(--color-accent);
+  --color-accent-subtle: var(--color-accent-subtle);
+  --color-success: var(--color-success);
+  --color-danger: var(--color-danger);
+  --color-warning: var(--color-warning);
+
+  --font-mono: var(--font-mono);
+
+  --text-xs: var(--text-xs);
+  --text-sm: var(--text-sm);
+  --text-base: var(--text-base);
+  --text-md: var(--text-md);
+  --text-lg: var(--text-lg);
+  --text-xl: var(--text-xl);
+  --text-2xl: var(--text-2xl);
+  --text-3xl: var(--text-3xl);
+
+  --spacing-1: var(--space-1);
+  --spacing-2: var(--space-2);
+  --spacing-3: var(--space-3);
+  --spacing-4: var(--space-4);
+  --spacing-5: var(--space-5);
+  --spacing-6: var(--space-6);
+  --spacing-8: var(--space-8);
+  --spacing-10: var(--space-10);
+  --spacing-16: var(--space-16);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-full: var(--radius-full);
+}
+
+:root {
+  /* === THEME: OBSIDIAN (default dark) === */
+  --color-bg:             #0A0A0A;
+  --color-surface:        #141414;
+  --color-surface-raised: #1E1E1E;
+  --color-border:         #2A2A2A;
+  --color-text-primary:   #F5F5F5;
+  --color-text-secondary: #888888;
+  --color-accent:         #F5F5F5;
+  --color-accent-subtle:  #1E1E1E;
+  --color-success:        #22C55E;
+  --color-danger:         #EF4444;
+  --color-warning:        #EAB308;
+
+  /* === TYPOGRAPHY === */
+  --font-mono: 'JetBrains Mono', ui-monospace, 'Courier New', monospace;
+  --text-xs:   11px;
+  --text-sm:   13px;
+  --text-base: 15px;
+  --text-md:   17px;
+  --text-lg:   20px;
+  --text-xl:   24px;
+  --text-2xl:  32px;
+  --text-3xl:  48px;
+
+  /* === SPACING === */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-16: 64px;
+
+  /* === BORDER RADIUS === */
+  --radius-sm:   4px;
+  --radius-md:   8px;
+  --radius-lg:   12px;
+  --radius-xl:   16px;
+  --radius-full: 9999px;
+
+  /* === MOTION === */
+  --duration-instant:    80ms;
+  --duration-fast:       150ms;
+  --duration-base:       200ms;
+  --duration-slow:       300ms;
+  --duration-deliberate: 400ms;
+  --ease-snap:    cubic-bezier(0.25, 0, 0, 1);
+  --ease-out:     cubic-bezier(0, 0, 0.2, 1);
+  --ease-in:      cubic-bezier(0.4, 0, 1, 1);
+  --ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* === THEME: EMBER (Orange & Black) === */
+[data-theme="ember"] {
+  --color-bg:             #0C0C0C;
+  --color-surface:        #161616;
+  --color-surface-raised: #1F1F1F;
+  --color-border:         #2C2C2C;
+  --color-text-primary:   #F5F5F5;
+  --color-text-secondary: #999999;
+  --color-accent:         #F97316;
+  --color-accent-subtle:  #1C1107;
+}
+
+/* === THEME: FROST (White & Blue) === */
+[data-theme="frost"] {
+  --color-bg:             #F0F4FF;
+  --color-surface:        #FFFFFF;
+  --color-surface-raised: #E8EFFF;
+  --color-border:         #D0DEFF;
+  --color-text-primary:   #0F172A;
+  --color-text-secondary: #64748B;
+  --color-accent:         #2563EB;
+  --color-accent-subtle:  #EFF6FF;
+  --color-success:        #16A34A;
+  --color-danger:         #DC2626;
+  --color-warning:        #CA8A04;
+}
+
+/* === THEME: CIRCUIT (Green & Black) === */
+[data-theme="circuit"] {
+  --color-bg:             #080C08;
+  --color-surface:        #0D120D;
+  --color-surface-raised: #121A12;
+  --color-border:         #1A2A1A;
+  --color-text-primary:   #E8F5E8;
+  --color-text-secondary: #6B8F6B;
+  --color-accent:         #22C55E;
+  --color-accent-subtle:  #0A1A0A;
+  --color-success:        #4ADE80;
+}
+
+/* === THEME: VOID (Purple & Dark) === */
+[data-theme="void"] {
+  --color-bg:             #09080F;
+  --color-surface:        #100E1A;
+  --color-surface-raised: #18152A;
+  --color-border:         #251F3D;
+  --color-text-primary:   #EDE9FE;
+  --color-text-secondary: #7C6FAE;
+  --color-accent:         #A855F7;
+  --color-accent-subtle:  #1A1030;
+  --color-success:        #34D399;
+  --color-danger:         #F87171;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-text-primary);
+    font-family: var(--font-mono);
+    margin: 0;
+    transition: background-color var(--duration-fast) var(--ease-snap);
+    -webkit-font-smoothing: antialiased;
+  }
+}
